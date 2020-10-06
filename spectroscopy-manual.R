@@ -51,7 +51,7 @@ fun(imgs)
 
 # Plot with calibration samples only
 samples_plot <- ggplot() +
-  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 5, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
   ggtitle("[insert title") + 
   xlab("x-axis") +
   ylab("y-axis") + 
@@ -70,6 +70,28 @@ samples_plot
 cc <- lm(n_vals$n ~ n_vals$conc)
 summary(cc)
 
+# Plotting just the calibration curve (with error bars and with error ribbon commented out)
+
+justccplot <- ggplot() +
+  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
+  geom_abline(intercept = cc$coefficients[1], slope = cc$coefficients[2], size = 1.5) +
+  geom_errorbar(aes(x=n_vals$conc[1:15], y=predict(cc), ymax=predict(cc) + summary(cc)$sigma,
+                   ymin=predict(cc) - summary(cc)$sigma), width = 4, size = 0.8) +
+  #geom_ribbon(aes(x=n_vals$conc[1:15], y=predict(cc), ymax=predict(cc) + summary(cc)$sigma,
+  #                ymin=predict(cc) - summary(cc)$sigma), alpha=0.2) + 
+  ggtitle("Spectroscopy of NaCl") + 
+  xlab("NaCl Concentration [mg/L]") +
+  ylab("Visual Difference from [NaCl] = 0") + 
+  theme_fivethirtyeight(base_size = 15) %+replace% 
+  theme(axis.title.x = element_text(margin = margin(t = 0.8 * 5,
+                                                    b = 0.8 * 5/2)),
+        axis.title.y = element_text(angle = 90, 
+                                    margin = margin(r = 0.8 * 5,
+                                                    l = 0.8 * 5/2)),
+        plot.title = element_text(size = 25, 
+                                  margin = margin(b = 30)))
+
+
 # This function calculates the values of x from the observed y
 # and populates the n_vals dataframe
 det_conc <- function(n_vals) {
@@ -87,9 +109,9 @@ paste("Average value of the variable we are trying to estimate is", mean(n_vals$
 
 # Plot with calibration samples and data samples
 plot <- ggplot() +
-  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 5, alpha = 0.6) +
-  geom_point(aes(n_vals$conc[16:18], n_vals$n[16:18]), colour = "orangered2", size = 5, alpha = 0.6) +
-  geom_point(aes(n_vals$conc[19:21], n_vals$n[19:21]), colour = "palegreen3", size = 5, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[16:18], n_vals$n[16:18]), colour = "orangered2", size = 4, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[19:21], n_vals$n[19:21]), colour = "palegreen3", size = 4, alpha = 0.6) +
   ggtitle("[insert title]") + 
   xlab("x-axis") +
   ylab("y-axis") + 
@@ -106,10 +128,10 @@ plot
 
 # Plot with calibration samples, data samples and calibration curve
 ccplot <- ggplot() +
-  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 5, alpha = 0.6) +
-  geom_point(aes(n_vals$conc[16:18], n_vals$n[16:18]), colour = "orangered2", size = 5, alpha = 0.6) +
-  geom_point(aes(n_vals$conc[19:21], n_vals$n[19:21]), colour = "palegreen3", size = 5, alpha = 0.6) +
-  geom_abline(intercept = cc$coefficients[1], slope = cc$coefficients[2], size = 0.8) +
+  geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[16:18], n_vals$n[16:18]), colour = "orangered2", size = 4, alpha = 0.6) +
+  geom_point(aes(n_vals$conc[19:21], n_vals$n[19:21]), colour = "palegreen3", size = 4, alpha = 0.6) +
+  geom_abline(intercept = cc$coefficients[1], slope = cc$coefficients[2], size = 1.5) +
   ggtitle("[insert title]") + 
   xlab("x-axis") +
   ylab("y-axis") + 
