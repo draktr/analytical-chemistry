@@ -75,13 +75,13 @@ justccplot <- ggplot() +
   geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
   geom_abline(intercept = cc$coefficients[1], slope = cc$coefficients[2], size = 1.5) +
   geom_errorbar(aes(x=n_vals$conc[1:15], y=predict(cc), ymax=predict(cc) + summary(cc)$sigma,
-                   ymin=predict(cc) - summary(cc)$sigma), width = 4, size = 0.8) +
+                   ymin=predict(cc) - summary(cc)$sigma), width = 4, size = 0.7) +
   #geom_ribbon(aes(x=n_vals$conc[1:15], y=predict(cc), ymax=predict(cc) + summary(cc)$sigma,
   #                ymin=predict(cc) - summary(cc)$sigma), alpha=0.2) + 
   ggtitle("[insert title]") + 
   xlab("x-axis") +
   ylab("y-axis") +
-  theme_fivethirtyeight(base_size = 15) %+replace% 
+  theme_classic(base_size = 15) %+replace% 
   theme(axis.title.x = element_text(margin = margin(t = 0.8 * 5,
                                                     b = 0.8 * 5/2)),
         axis.title.y = element_text(angle = 90, 
