@@ -31,3 +31,4 @@ fn <- function(y) {
   return(c(Charge,X_moles,Na_moles))
 }
 
+library("nleqslv")
