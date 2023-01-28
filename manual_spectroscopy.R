@@ -239,5 +239,11 @@ n_vals <- process_samples(samples)
 summary(cc)
 plot_samples(n_vals, cc)
 n_vals <- det_conc(n_vals)
+calibration_plot <- plot_calibration(n_vals, cc)
+data_plot <- scatterplot(n_vals)
+full_plot <- plot(n_vals)
 # Results
 paste("Average value is:", mean(n_vals$conc[16:18]))
+calibration_plot
+data_plot
+full_plot
