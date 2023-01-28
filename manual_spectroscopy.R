@@ -1,3 +1,8 @@
+################################################
+### Analysis part of the manual spectroscopy ###
+################################################
+
+
 library(OpenImageR)
 library(tidyverse)
 
@@ -6,7 +11,19 @@ references <- c()
 concentrations <- c()
 samples <- c()
 
-# `process_references` will get us the reference image
+#' Processes a reference images. These are used as references against
+#' which to compare samples and estimate desired variables.
+#'
+#' @param references Vector of strings with paths to reference images
+#' @param w_from Left image crop bound
+#' @param w_to Right image crop bound
+#' @param h_from Bottom image crop bound
+#' @param h_to Top image crop bound
+#'
+#' @return Array of a mean reference
+#' @export
+#'
+#' @examples
 process_references <- function(references,
                                w_from = 250, w_to = 1080,
                                h_from = 650, h_to = 1300) {
@@ -25,7 +42,22 @@ process_references <- function(references,
   return(mg_0)
 }
 
-# `process_samples` will prepare the calibration samples
+#' Processes sample images. Sample images are those that count as
+#' spectroscopic measurements where variable of interest has been
+#' manipulated.
+#'
+#' @param samples Vector of strings with paths to sample images
+#' @param w_from Left image crop bound
+#' @param w_to Right image crop bound
+#' @param h_from Bottom image crop bound
+#' @param h_to Top image crop bound
+#'
+#' @return Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names
+#' @export
+#'
+#' @examples
 process_samples <- function(samples,
                             w_from = 250, w_to = 1080,
                             h_from = 650, h_to = 1300) {
@@ -52,7 +84,18 @@ process_samples <- function(samples,
 # Estimating the calibration curve parameters
 cc <- lm(n_vals$n ~ n_vals$conc)
 
-# Plotting just the calibration curve (with error bars and with error ribbon commented out)
+#' Plots just the calibration curve
+#' (with error bars and with error ribbon commented out)
+#'
+#' @param n_vals Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names
+#' @param cc Calibration curve linear model `lm()` parameters
+#'
+#' @return Plot of calibration curve
+#' @export
+#'
+#' @examples
 plot_calibration <- function(n_vals, cc) {
   calibration_plot <- ggplot() +
     geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
@@ -87,9 +130,21 @@ plot_calibration <- function(n_vals, cc) {
   return(calibration_plot)
 }
 
-# `det_conc` calculates the values of x from the observed y
-# and populates the n_vals dataframe
-det_conc <- function(n_vals) {
+#' Calculates the values of implied concentrations
+#' and populates `n_vals` dataframe
+#'
+#' @param n_vals Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names
+#'
+#' @return Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names repopulated with
+#' implied concentrations
+#' @export
+#'
+#' @examples
+determine_concentration <- function(n_vals) {
   for (i in seq(length(n_vals$conc))) {
     if (is.na(n_vals$conc[i])) {
       n_vals$conc[i] <<- (n_vals$n[i] - cc$coefficients[1]) / cc$coefficients[2]
@@ -98,7 +153,16 @@ det_conc <- function(n_vals) {
   return(n_vals)
 }
 
-# Plot with calibration samples and data samples
+#' Plots calibration and data samples (without calibration curve)
+#'
+#' @param n_vals Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names
+#'
+#' @return Plot of calibration and data samples
+#' @export
+#'
+#' @examples
 scatterplot <- function(n_vals) {
   scatterplot <- ggplot() +
     geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
@@ -129,6 +193,16 @@ scatterplot <- function(n_vals) {
 }
 
 # Plot with calibration samples, data samples and calibration curve
+#' Plots calibration samples, data samples and calibration curve
+#'
+#' @param n_vals Dataframe with sum of squares difference between each
+#' of the sample images and the mean reference, concentrations
+#' (independent variable) and sample names
+#'
+#' @return Plot with calibration samples, data samples and calibration curve
+#' @export
+#'
+#' @examples
 plot <- function(n_vals) {
   plot <- ggplot() +
     geom_point(aes(n_vals$conc[1:15], n_vals$n[1:15]), colour = "black", size = 4, alpha = 0.6) +
@@ -159,11 +233,11 @@ plot <- function(n_vals) {
   return(plot)
 }
 
-# Running the functions
+# Running the functions and conducting the analysis
 mg_0 <- process_references(references)
 n_vals <- process_samples(samples)
 summary(cc)
 plot_samples(n_vals, cc)
 n_vals <- det_conc(n_vals)
 # Results
-paste("Average value of the variable we are trying to estimate is", mean(n_vals$conc[16:18]))
+paste("Average value is:", mean(n_vals$conc[16:18]))
